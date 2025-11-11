@@ -46,6 +46,27 @@
   </p>
 
   <p><a href="menu.html">メニューに戻る</a></p>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
+    authDomain: "a12projecte.firebaseapp.com",
+    projectId: "a12projecte",
+    storageBucket: "a12projecte.appspot.com",
+    messagingSenderId: "569175412883",
+    appId: "1:569175412883:web:4585a2803c70498b3b7d66",
+    measurementId: "G-3PYDDYB5XL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ログイン処理などここに書く
+</script>
+
 </body>
 </html>
+
 
