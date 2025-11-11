@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教えあいシステム - 問題選択</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .problem-selection {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .problem-box {
+            border: 2px solid #5cb85c; /* 緑の枠 */
+            padding: 30px;
+            margin-bottom: 30px;
+            background-color: #f9fff9;
+            border-radius: 8px;
+        }
+
+        .problem-options label {
+            display: block;
+            text-align: left;
+            margin: 15px 0;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .problem-options input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.5); /* ラジオボタンを少し大きく */
+            vertical-align: middle;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">教えあいシステム</div>
+
+    <div class="container problem-selection">
+        <div class="problem-box">
+            <h2>問題文を選択してください</h2>
+            <div class="problem-options">
+                <label>
+                    <input type="radio" name="problem" value="問題1"> ① --------------------------------
+                </label>
+                <label>
+                    <input type="radio" name="problem" value="問題2"> ② --------------------------------
+                </label>
+                <label>
+                    <input type="radio" name="problem" value="問題3"> ③ --------------------------------
+                </label>
+                <label>
+                    <input type="radio" name="problem" value="問題4"> ④ --------------------------------
+                </label>
+            </div>
+        </div>
+        <button class="button" onclick="sendProblem()">送信</button>
+        <p class="message">児童に一斉送信されます</p>
+    </div>
+
+    <script>
+        function sendProblem() {
+            const selectedProblem = document.querySelector('input[name="problem"]:checked');
+
+            if (selectedProblem) {
+                // ここに問題文送信処理（例: API呼び出し）を記述
+                console.log('選択された問題:', selectedProblem.value);
+                alert(`「${selectedProblem.value}」を送信しました。`);
+                // 送信成功後、次のページへ遷移
+                // window.location.href = 'problem_sent.html'; // 例
+            } else {
+                alert('問題文を選択してください。');
+            }
+        }
+    </script>
+</body>
+</html>
