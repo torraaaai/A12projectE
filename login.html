@@ -48,28 +48,38 @@
   </p>
 
   <p><a href="menu.html">メニューに戻る</a></p>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
+
+ <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "",
+    apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
     authDomain: "a12projecte.firebaseapp.com",
     projectId: "a12projecte",
-    storageBucket: "a12projecte.appspot.com",
+    storageBucket: "a12projecte.firebasestorage.app",
     messagingSenderId: "569175412883",
     appId: "1:569175412883:web:4585a2803c70498b3b7d66",
     measurementId: "G-3PYDDYB5XL"
   };
 
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const analytics = getAnalytics(app);
+</script>
 
   // ログイン処理などここに書く
 </script>
 
 </body>
 </html>
+
 
 
 
