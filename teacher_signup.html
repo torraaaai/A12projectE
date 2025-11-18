@@ -4,30 +4,36 @@
   <meta charset="UTF-8">
   <title>教員新規登録</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="body .css">
+  <!-- ファイル名にスペースが無い前提で修正 -->
+  <link rel="stylesheet" href="body.css">
 </head>
 <body>
   <div class="header">教えあいシステム</div>
- 
 
-  <form>
-    <p>教員ログイン</p>
+  <form id="teacher-signup-form">
+    <p>教員新規登録</p>
+
     <div>
       <label for="name">氏名：</label>
       <input type="text" id="name" name="name" required>
     </div>
+
     <div>
       <label for="email">メールアドレス：</label>
       <input type="email" id="email" name="email" required>
     </div>
+
     <div>
       <label for="password">パスワード：</label>
       <input type="password" id="password" name="password" required>
     </div>
+
     <div>
       <label for="invite_code">招待コード：</label>
-      <input type="text" id="invite_code" name="invite_code" placeholder="例：YAMATO" required>
+      <input type="text" id="invite_code" name="invite_code"
+             placeholder="例：YAMATO" required>
     </div>
+
     <div>
       <button type="submit">登録する</button>
     </div>
@@ -35,30 +41,77 @@
 
   <p><a href="login.html?role=teacher">教員ログイン画面へ</a></p>
   <p><a href="menu.html">メニューに戻る</a></p>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "",
-    authDomain: "a12projecte.firebaseapp.com",
-    projectId: "a12projecte",
-    storageBucket: "a12projecte.appspot.com",
-    messagingSenderId: "569175412883",
-    appId: "1:569175412883:web:4585a2803c70498b3b7d66",
-    measurementId: "G-3PYDDYB5XL"
-  };
+  <script type="module">
+    // Firebase SDK 読み込み
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    // ★ ここの設定はあなたの Firebase コンソールの「Config」と同じにする
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
+      authDomain: "a12projecte.firebaseapp.com",
+      projectId: "a12projecte",
+      storageBucket: "a12projecte.appspot.com",
+      messagingSenderId: "569175412883",
+      appId: "1:569175412883:web:4585a2803c70498b3b7d66",
+      measurementId: "G-3PYDDYB5XL"
+    };
 
-  // ログイン処理などここに書く
-</script>
+    // Firebase 初期化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
+    // フォーム送信イベント
+    const form = document.getElementById("teacher-signup-form");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault(); // ページリロード防止
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const inviteCode = document.getElementById("invite_code").value.trim();
+
+      // ① 招待コードチェック（YAMATO 以外はエラー）
+      if (inviteCode !== "YAMATO") {
+        alert("招待コードが間違っています。もう一度確認してください。");
+        return;
+      }
+
+      try {
+        // ② Firebase Authentication にユーザー作成
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        // ③ Firestore に教員情報を保存
+        await setDoc(doc(db, "teachers", user.uid), {
+          name: name,
+          email: email,
+          role: "teacher",
+          createdAt: serverTimestamp()
+        });
+
+        alert("教員登録が完了しました！ログインしてください。");
+
+        // ④ 教員ログイン画面へ遷移
+        window.location.href = "login.html?role=teacher";
+      } catch (error) {
+        console.error(error);
+        alert("登録に失敗しました：" + error.message);
+      }
+    });
+  </script>
 </body>
 </html>
-
-
-
-
-
