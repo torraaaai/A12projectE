@@ -74,61 +74,40 @@
     const form = document.getElementById("teacher-signup-form");
 
     form.addEventListener("submit", async (e) => {
-      e.preventDefault(); // 画面遷移を止める
+  e.preventDefault();
+  console.log("submit start");
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const inviteCode = document.getElementById("invite_code").value.trim();
+  const name       = document.getElementById("name").value.trim();
+  const email      = document.getElementById("email").value.trim();
+  const password   = document.getElementById("password").value;
+  const inviteCode = document.getElementById("invite_code").value.trim();
 
-      if (!name || !email || !password || !inviteCode) {
-        alert("全ての項目を入力してください。");
-        return;
-      }
+  // ★ここで実際に取れているメールを確認
+  console.log("入力されたメールアドレス → [" + email + "]");
 
-      try {
-        // ① Firestore で招待コードをチェック
-        //    コレクション: school
-        //    フィールド:    code
-        const q = query(
-          collection(db, "school"),
-          where("code", "==", inviteCode)
-        );
-        const querySnapshot = await getDocs(q);
+  // ★自前チェック（空 or 形式がおかしければ Firebase を呼ばない）
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    alert("メールアドレスの形式が正しくありません。\n半角の @ と . を使って入力してください。");
+    return;
+  }
 
-        if (querySnapshot.empty) {
-          // school コレクション内に code == inviteCode のドキュメントが無ければ NG
-          alert("招待コードが正しくありません。");
-          return;
-        }
+  if (!name || !password || !inviteCode) {
+    alert("全ての項目を入力してください。");
+    return;
+  }
 
-        // ② Auth に教員ユーザーを登録（メール＋パスワード）
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+  try {
+    // ここから下は今まで通り（招待コードチェック → createUserWithEmailAndPassword…）
+    ...
+  } catch (err) {
+    console.error("登録エラー:", err.code, err.message);
+    alert("登録に失敗しました: " + err.code + " / " + err.message);
+  }
+});
 
-        const user = userCredential.user;
-
-        // ③ Firestore の teachers コレクションにも情報を保存（お好みで）
-        await setDoc(doc(db, "teachers", user.uid), {
-          name: name,
-          email: email,
-          role: "teacher",
-          createdAt: new Date()
-        });
-
-        alert("教員登録が完了しました！ログインしてください。");
-        // 完了したら教員ログイン画面へ
-        window.location.href = "login.html?role=teacher";
-      } catch (error) {
-        console.error("登録エラー:", error);
-        // Firebase Auth から返ってくるエラーメッセージを表示
-        alert("登録に失敗しました: " + (error.message || "不明なエラー"));
-      }
-    });
   </script>
 
 </body>
 </html>
+
