@@ -4,36 +4,31 @@
   <meta charset="UTF-8">
   <title>教員新規登録</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- ファイル名にスペースが無い前提で修正 -->
+  <!-- ファイル名が body.css ならこれでOK。違ったら直してね -->
   <link rel="stylesheet" href="body.css">
 </head>
 <body>
   <div class="header">教えあいシステム</div>
 
   <form id="teacher-signup-form">
-    <p>教員新規登録</p>
-
+    <p>教員ログイン</p>
     <div>
       <label for="name">氏名：</label>
       <input type="text" id="name" name="name" required>
     </div>
-
     <div>
       <label for="email">メールアドレス：</label>
       <input type="email" id="email" name="email" required>
     </div>
-
     <div>
       <label for="password">パスワード：</label>
       <input type="password" id="password" name="password" required>
     </div>
-
     <div>
       <label for="invite_code">招待コード：</label>
       <input type="text" id="invite_code" name="invite_code"
              placeholder="例：YAMATO" required>
     </div>
-
     <div>
       <button type="submit">登録する</button>
     </div>
@@ -43,17 +38,23 @@
   <p><a href="menu.html">メニューに戻る</a></p>
 
   <script type="module">
-    // Firebase SDK 読み込み
+    // ===== Firebase SDK 読み込み =====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import {
       getFirestore,
+      collection,
+      query,
+      where,
+      getDocs,
       doc,
-      setDoc,
-      serverTimestamp
+      setDoc
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // ★ ここの設定はあなたの Firebase コンソールの「Config」と同じにする
+    // ★ここはあなたのプロジェクトの設定で置き換えてOK
     const firebaseConfig = {
       apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
       authDomain: "a12projecte.firebaseapp.com",
@@ -72,46 +73,62 @@
     // フォーム送信イベント
     const form = document.getElementById("teacher-signup-form");
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault(); // ページリロード防止
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // 画面遷移を止める
 
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
       const inviteCode = document.getElementById("invite_code").value.trim();
 
-      // ① 招待コードチェック（YAMATO 以外はエラー）
-      if (inviteCode !== "YAMATO") {
-        alert("招待コードが間違っています。もう一度確認してください。");
+      if (!name || !email || !password || !inviteCode) {
+        alert("全ての項目を入力してください。");
         return;
       }
 
       try {
-        // ② Firebase Authentication にユーザー作成
+        // ① Firestore で招待コードをチェック
+        //    コレクション: school
+        //    フィールド:    code
+        const q = query(
+          collection(db, "school"),
+          where("code", "==", inviteCode)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          // school コレクション内に code == inviteCode のドキュメントが無ければ NG
+          alert("招待コードが正しくありません。");
+          return;
+        }
+
+        // ② Auth に教員ユーザーを登録（メール＋パスワード）
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
+
         const user = userCredential.user;
 
-        // ③ Firestore に教員情報を保存
+        // ③ Firestore の teachers コレクションにも情報を保存（お好みで）
         await setDoc(doc(db, "teachers", user.uid), {
           name: name,
           email: email,
           role: "teacher",
-          createdAt: serverTimestamp()
+          createdAt: new Date()
         });
 
         alert("教員登録が完了しました！ログインしてください。");
-
-        // ④ 教員ログイン画面へ遷移
+        // 完了したら教員ログイン画面へ
         window.location.href = "login.html?role=teacher";
       } catch (error) {
-        console.error(error);
-        alert("登録に失敗しました：" + error.message);
+        console.error("登録エラー:", error);
+        // Firebase Auth から返ってくるエラーメッセージを表示
+        alert("登録に失敗しました: " + (error.message || "不明なエラー"));
       }
     });
   </script>
+
 </body>
 </html>
