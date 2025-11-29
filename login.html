@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="body .css">
+  <link rel="stylesheet" href="all.css">
+  
   <script>
     // URLの?role=teacher または ?role=student を読み取る
     window.onload = function() {
@@ -25,65 +26,57 @@
   </script>
 </head>
 <body>
+  
   <div class="header">教えあいシステム</div>
   
+  <div class="container">
+    <form>
+      <h2 id="role-title" class="page-title">ログイン</h2>
 
-  <form>
-    <div>
-      <p>ログイン</p>
-      <label for="email">メールアドレス：</label>
-      <input type="email" id="email" name="email" required>
+      <div class="form-group">
+        <input type="email" id="email" name="email" class="input-text" placeholder="メールアドレス" required>
+      </div>
+
+      <div class="form-group">
+        <input type="password" id="password" name="password" class="input-text" placeholder="パスワード" required>
+      </div>
+
+      <div>
+        <button type="submit" class="btn-primary">ログイン</button>
+      </div>
+    </form>
+
+    <div id="teacher-signup" style="display:none; margin-top:20px;">
+      <a href="teacher_signup.html" class="link-text">教員新規登録はこちら</a>
     </div>
+
     <div>
-      <label for="password">パスワード：</label>
-      <input type="password" id="password" name="password" required>
+      <a href="menu.html" class="link-text">メニューに戻る</a>
     </div>
-    <div>
-      <button type="submit">ログイン</button>
-    </div>
-  </form>
+  </div>
 
-  <p id="teacher-signup" style="display:none;">
-    <a href="teacher_signup.html">教員新規登録はこちら</a>
-  </p>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
-  <p><a href="menu.html">メニューに戻る</a></p>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
+      authDomain: "a12projecte.firebaseapp.com",
+      projectId: "a12projecte",
+      storageBucket: "a12projecte.firebasestorage.app",
+      messagingSenderId: "569175412883",
+      appId: "1:569175412883:web:4585a2803c70498b3b7d66",
+      measurementId: "G-3PYDDYB5XL"
+    };
 
-
- <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCnyh0u27rama3eVDFEuHBYt1tf1ot9O10",
-    authDomain: "a12projecte.firebaseapp.com",
-    projectId: "a12projecte",
-    storageBucket: "a12projecte.firebasestorage.app",
-    messagingSenderId: "569175412883",
-    appId: "1:569175412883:web:4585a2803c70498b3b7d66",
-    measurementId: "G-3PYDDYB5XL"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-  // ログイン処理などここに書く
-</script>
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    
+    // ログイン処理などここに書く
+  </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-

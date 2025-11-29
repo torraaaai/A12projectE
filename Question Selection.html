@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教えあいシステム - 問題作成</title>
+    <link rel="stylesheet" href="all.css">
+</head>
+<body>
+    
+    <div class="header">教えあいシステム</div>
+
+    <div class="container">
+        
+        <input type="text" id="problemTitle" class="input-green-box" placeholder="タイトルを入力してください">
+
+        <textarea id="problemBody" class="input-green-box textarea" placeholder="問題文を入力してください"></textarea>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-primary" onclick="sendProblem()">送信</button>
+            <p style="font-size: 14px; margin-top: 10px;">児童に一斉送信されます</p>
+        </div>
+
+    </div>
+
+    <script>
+        function sendProblem() {
+            // 入力されたタイトルと本文を取得
+            const title = document.getElementById('problemTitle').value;
+            const body = document.getElementById('problemBody').value;
+
+            if (title && body) {
+                // 送信処理（API呼び出しなど）
+                console.log('タイトル:', title);
+                console.log('問題文:', body);
+                
+                alert('問題を送信しました。');
+                
+                // 送信後の遷移（例: 送信完了画面へ）
+                // window.location.href = 'problem_sent.html';
+            } else {
+                alert('タイトルと問題文を入力してください。');
+            }
+        }
+    </script>
+</body>
+</html>

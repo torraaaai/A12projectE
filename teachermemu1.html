@@ -4,73 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教えあいシステム - メニュー</title>
-    <style>
-        /* --- 共通CSS (ここから) --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-        }
-        .header {
-            background-color: #4A7FD3;
-            color: white;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 40px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        /* --- 共通CSS (ここまで) --- */
-
-        /* メニュー画面専用のスタイル */
-        .menu-buttons {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .oval-button {
-            width: 250px;
-            height: 120px;
-            border: 1px solid #7cbd7c; /* 画像に合わせた緑色の線 */
-            border-radius: 50%; /* 楕円形にする */
-            background-color: white;
-            color: #000;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .oval-button:hover {
-            background-color: #f0fff0;
-            transform: scale(1.05);
-        }
-    </style>
+    <link rel="stylesheet" href="all.css">
 </head>
 <body>
+    
     <div class="header">教えあいシステム</div>
 
     <div class="container">
-        <div class="menu-buttons">
-            <a href="problem.html" class="oval-button">問題作成</a>
-            <a href="student_list.html" class="oval-button">児童アカウント管理</a>
+        
+        <div class="oval-btn-container" style="margin-top: 80px;">
+            
+            <a href="problem.html" class="btn-oval outline-green">
+                問題作成
+            </a>
+            
+            <a href="student_list.html" class="btn-oval outline-green">
+                児童アカウント管理
+            </a>
+
         </div>
+
     </div>
+
 </body>
 </html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教えあいシステム - 回答詳細</title>
+    <link rel="stylesheet" href="all.css">
+</head>
+<body>
+    
+    <div class="header">教えあいシステム</div>
+
+    <div class="container">
+        
+        <div style="max-width: 600px; margin: 0 auto;">
+            
+            <h2 id="studentNameDisplay" class="student-label">氏名 (A)</h2>
+            
+            <div class="answer-box">
+                回答を表示
+            </div>
+
+            <div class="rating-area">
+                <span class="rating-text">評価</span>
+                <button class="btn-circle" data-rating="S" onclick="selectRating(this)">S</button>
+                <button class="btn-circle" data-rating="A" onclick="selectRating(this)">A</button>
+                <button class="btn-circle" data-rating="B" onclick="selectRating(this)">B</button>
+                <button class="btn-circle" data-rating="C" onclick="selectRating(this)">C</button>
+            </div>
+
+            <button class="btn-primary" onclick="confirmRating()">確定</button>
+
+        </div>
+    </div>
+
+    <script>
+        let selectedRating = null;
+
+        function selectRating(button) {
+            // 全ての評価ボタンから'selected'クラスを削除
+            // クラス名が btn-circle に変わったのでセレクタも変更
+            const allRatingButtons = document.querySelectorAll('.btn-circle');
+            allRatingButtons.forEach(btn => btn.classList.remove('selected'));
+
+            // クリックされたボタンに'selected'クラスを追加
+            button.classList.add('selected');
+            selectedRating = button.dataset.rating;
+            console.log('選択された評価:', selectedRating);
+        }
+
+        function confirmRating() {
+            if (selectedRating) {
+                // 名前を取得（"氏名 (A)" から "A" を取り出す簡易処理）
+                const nameText = document.getElementById('studentNameDisplay').textContent;
+                const studentName = nameText.replace('氏名 (', '').replace(')', '');
+                
+                // 完了アラート
+                alert(`${studentName}さんの評価を「${selectedRating}」で確定しました！`);
+                
+                // 画面遷移（例）
+                // window.location.href = 'view_answers.html';
+            } else {
+                alert('評価を選択してください。');
+            }
+        }
+
+        // ページロード時の処理
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const student = urlParams.get('student');
+            if (student) {
+                document.getElementById('studentNameDisplay').textContent = `氏名 (${student})`;
+            }
+        };
+    </script>
+</body>
+</html>
