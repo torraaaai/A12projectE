@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>児童チャット</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{
+      font-family:system-ui; margin:0;
+      background:#f5f7fa;
+      display:flex; justify-content:center;
+      padding:20px;
+    }
+    .box{
+      width:100%; max-width:750px;
+      background:white; border-radius:10px;
+      padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.1);
+    }
+    #chat{ height:420px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
+    .msg{ margin-bottom:12px; }
+    .me{ color:#0b6efd; }
+    .ai{ color:#333; background:#eef4ff; padding:8px; border-radius:6px; }
+    #inputArea{ margin-top:10px; display:flex; gap:8px; }
+    #inputArea input{ flex:1; padding:10px; }
+    #inputArea button{ padding:10px 14px; background:#0b6efd; color:white; border:none; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>児童チャット</h2>
+
+    <div id="problemArea" style="padding:10px; background:#f0f0f0; margin-bottom:10px;">
+      問題読み込み中…
+    </div>
+
+    <div id="chat"></div>
+
+    <div id="inputArea">
+      <input id="msgInput" type="text" placeholder="説明を入力" />
+      <button id="sendBtn">送信</button>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const problemArea = document.getElementById("problemArea");
+
+    let problemText = "";
+
+    // --- 問題の取得 ---
+    async function loadProblem(){
+      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
+      const data = await res.json();
+      problemText = data.problem || "(まだ設定されていません)";
+      problemArea.textContent = "今日の問題: " + problemText;
+
+      // AI に自動で「最初の質問」を送らせる
+      if(problemText.trim() !== ""){
+        chat.innerHTML += `<div class="ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
+      }
+    }
+
+    loadProblem();
+
+
+    // --- チャット送信 ---
+    async function sendMessage(){
+      const text = input.value.trim();
+      if(!text) return;
+
+      chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      input.value = "";
+      sendBtn.disabled = true;
+
+      const res = await fetch("http://127.0.0.1:8000/api/ai_response", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
+      const ai = data.response;
+
+      chat.innerHTML += `<div class="msg ai">児童: ${ai}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      sendBtn.disabled = false;
+      input.focus();
+    }
+
+    sendBtn.onclick = sendMessage;
+    input.onkeydown = (e)=>{ if(e.key==="Enter") sendMessage(); };
+  </script>
+</body>
+</html>

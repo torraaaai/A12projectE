@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>先生ページ</title>
+  <style>
+    body{ font-family:sans-serif; padding:20px; }
+    input,textarea,button{
+      font-size:16px; padding:8px;
+    }
+    textarea{ width:100%; height:150px; }
+    button{ margin-top:10px; }
+  </style>
+</head>
+<body>
+  <h1>先生ページ（問題を設定）</h1>
+
+  <p>児童に出す問題を入力してください：</p>
+
+  <textarea id="problemInput" placeholder="例：関ヶ原の戦いとはどんな戦いでしょうか？"></textarea>
+  <br>
+
+  <button onclick="sendProblem()">問題を送信</button>
+
+  <p id="result"></p>
+
+  <hr>
+
+  <button onclick="location.href='student.html'">児童チャットページを開く</button>
+
+  <script>
+    async function sendProblem(){
+      const prob = document.getElementById("problemInput").value.trim();
+      if(!prob){ alert("問題を入力してください"); return; }
+
+      const res = await fetch("http://127.0.0.1:8000/api/set_problem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ problem: prob })
+      });
+
+      const data = await res.json();
+      document.getElementById("result").textContent =
+        "問題を設定しました: " + data.problem;
+    }
+  </script>
+</body>
+</html>
