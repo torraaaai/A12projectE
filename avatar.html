@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小学生アバター</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f0f7ff;
+      font-family: sans-serif;
+    }
+    .avatar {
+      width: 220px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .face {
+      width: 140px;
+      height: 140px;
+      background: #ffe2c8;
+      border-radius: 50%;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .eye {
+      width: 20px;
+      height: 20px;
+      background: #000;
+      border-radius: 50%;
+      position: absolute;
+      top: 55px;
+      transform-origin: center;
+    }
+    .eye.left { left: 35px; }
+    .eye.right { right: 35px; }
+
+    .blink {
+      animation: blink 3s infinite;
+    }
+    @keyframes blink {
+      0%, 92% { transform: scaleY(1); }
+      95%, 100% { transform: scaleY(0.1); }
+    }
+
+    .mouth {
+      width: 40px;
+      height: 10px;
+      border-bottom: 4px solid #d9534f;
+      border-radius: 0 0 20px 20px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 95px;
+      transform-origin: top;
+    }
+
+    .talk {
+      animation: talk 1s infinite;
+    }
+    @keyframes talk {
+      0%, 100% { height: 10px; }
+      50% { height: 25px; }
+    }
+
+    .body {
+      margin-top: 15px;
+      width: 120px;
+      height: 80px;
+      background: #7db7ff;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 15px;
+    }
+  .hair {
+      width: 160px;
+      height: 70px;
+      background: #3c2f2f;
+      border-radius: 80px 80px 20px 20px;
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .cheek {
+      width: 25px;
+      height: 25px;
+      background: #ffb3b3;
+      border-radius: 50%;
+      position: absolute;
+      top: 85px;
+    }
+    .cheek.left { left: 25px; }
+    .cheek.right { right: 25px; }
+
+</style>
+</head>
+<body>
+  <div class="avatar">
+    <div class="face">
+      <div class="hair"></div>
+      <div class="eye left blink"></div>
+      <div class="eye right blink"></div>
+      <div class="cheek left"></div>
+      <div class="cheek right"></div>
+      <div class="mouth talk"></div>
+    </div>
+    <div class="body"></div>
+  </div>
+
+  <script>
+    window.onload = () => {
+      document.querySelectorAll('.eye').forEach(e => e.classList.add('blink'));
+      document.querySelector('.mouth').classList.add('talk');
+    };
+  // 表情切り替え機能
+function setExpression(type) {
+  const mouth = document.querySelector('.mouth');
+  const cheeks = document.querySelectorAll('.cheek');
+
+  // 一旦リセット
+  mouth.style.borderBottom = "4px solid #d9534f";
+  mouth.style.height = "15px";
+  mouth.style.borderRadius = "0 0 20px 20px";
+  cheeks.forEach(c => c.style.opacity = 1);
+
+  if (type === 'smile') {
+    mouth.style.height = "25px";
+    mouth.style.borderBottom = "4px solid #d9534f";
+  }
+  if (type === 'sad') {
+    mouth.style.borderBottom = "none";
+    mouth.style.borderTop = "4px solid #d9534f";
+    mouth.style.borderRadius = "20px 20px 0 0";
+  }
+  if (type === 'angry') {
+    cheeks.forEach(c => c.style.background = '#ff8888');
+    mouth.style.borderBottom = "4px solid #b22";
+    mouth.style.height = "10px";
+  }
+  if (type === 'surprise') {
+    mouth.style.border = "4px solid #d9534f";
+    mouth.style.width = "25px";
+    mouth.style.height = "25px";
+    mouth.style.borderRadius = "50%";
+  }
+}
+
+// 例：表情テスト
+window.setTimeout(()=>setExpression('smile'),2000);
+window.setTimeout(()=>setExpression('surprise'),4000);
+window.setTimeout(()=>setExpression('angry'),6000);
+window.setTimeout(()=>setExpression('sad'),8000);
+</script>
+</body>
+</html>
