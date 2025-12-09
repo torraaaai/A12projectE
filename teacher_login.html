@@ -2,55 +2,52 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>教員新規登録</title>
+  <title>教員ログイン</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="all.css">
 </head>
 <body>
+  
   <div class="header">教えあいシステム</div>
+  
+  <div class="container">
+    <form id="teacher_login_form">
+      <h2 id="role-title" class="page-title">教員ログイン</h2>
 
-  <form id="teacher-signup-form">
-    <p>教員新規登録</p>
-    <div>
-      <label for="name">氏名：</label>
-      <input type="text" id="name" name="name" required>
-    </div>
-    <div>
-      <label for="email">メールアドレス：</label>
-      <input type="email" id="email" name="email" required>
-    </div>
-    <div>
-      <label for="password">パスワード：</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-    <div>
-      <label for="invite_code">招待コード：</label>
-      <input type="text" id="invite_code" name="invite_code"
-              placeholder="例：YAMATO" required>
-    </div>
-    <div>
-      <button type="submit">登録する</button>
-    </div>
-  </form>
+      <div class="form-group">
+        <input type="email" id="email" name="email" class="input-text" placeholder="メールアドレス" required>
+      </div>
 
-  <p><a href="login.html?role=teacher">教員ログイン画面へ</a></p>
-  <p><a href="menu.html">メニューに戻る</a></p>
+      <div class="form-group">
+        <input type="password" id="password" name="password" class="input-text" placeholder="パスワード" required>
+      </div>
+
+      <div>
+        <button type="submit" class="btn-primary">ログイン</button>
+      </div>
+    </form>
+
+    <div id="teacher-signup" style="display:none; margin-top:20px;">
+      <a href="teacher_signup.html" class="link-text">教員新規登録はこちら</a>
+    </div>
+
+    <div>
+      <a href="menu.html" class="link-text">メニューに戻る</a>
+    </div>
+  </div>
 
   <script type="module">
     // ★ PostgreSQLへのデータ登録はサーバーサイドのAPI経由で行います。
-    // そのため、Firebase関連のSDKは全て削除しました。
 
     // フォーム送信イベント
-    const form = document.getElementById("teacher-signup-form");
+    const form = document.getElementById("teacher_login_form");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       console.log("submit start");
 
-      const name       = document.getElementById("name").value.trim();
       const email      = document.getElementById("email").value.trim();
       const password   = document.getElementById("password").value;
-      const inviteCode = document.getElementById("invite_code").value.trim();
 
       console.log("入力されたメールアドレス → [" + email + "]");
 
@@ -61,24 +58,22 @@
         return;
       }
 
-      if (!name || !password || !inviteCode) {
-        alert("全ての項目を入力してください。");
+      if (!email || !password) {
+        alert("全ての項目を入力してください。。");
         return;
       }
 
       try {
         // ★ サーバーサイドAPIへデータを送信（PostgreSQL登録を依頼）
-        const response = await fetch('/api/teacher-signup', { 
+        const response = await fetch('/api/teacher_login', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             // JSON形式でデータをサーバーへ送ります
             body: JSON.stringify({
-                name: name,
                 email: email,
                 password: password, // ★ サーバー側で安全にハッシュ化します
-                inviteCode: inviteCode,
             }),
         });
 
@@ -87,14 +82,13 @@
 
         if (response.ok) {
             // HTTPステータスコードが200番台（成功）の場合
-            alert("登録が完了しました！");
-            // 成功後、教員ログイン画面などへ遷移させると良いでしょう
-            window.location.href = 'teacher_login.html'; 
+            alert("ログインに成功しました！");
+            // 成功後、教員ホーム画面へ遷移
+            window.location.href = 'teacher_home.html'; 
 
         } else {
             // HTTPステータスコードが400番台、500番台（エラー）の場合
-            console.error("登録エラー:", result.message);
-            alert("登録に失敗しました: " + result.message);
+            alert("ログインに失敗しました: " + result.message);
         }
 
       } catch (err) {

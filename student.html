@@ -17,6 +17,7 @@
       padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.1);
     }
     #chat{ height:420px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
+<<<<<<< HEAD
     .msg{ margin-bottom:12px; display:flex; align-items:flex-start; }
     .me{ color:#0b6efd; }
     .ai-bubble{
@@ -28,6 +29,11 @@
       width:55px; height:55px; border-radius:50%;
       border:2px solid #78a4ff; flex-shrink:0;
     }
+=======
+    .msg{ margin-bottom:12px; }
+    .me{ color:#0b6efd; }
+    .ai{ color:#333; background:#eef4ff; padding:8px; border-radius:6px; }
+>>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
     #inputArea{ margin-top:10px; display:flex; gap:8px; }
     #inputArea input{ flex:1; padding:10px; }
     #inputArea button{ padding:10px 14px; background:#0b6efd; color:white; border:none; }
@@ -57,6 +63,7 @@
 
     let problemText = "";
 
+<<<<<<< HEAD
     // --- アバター画像パス ---
     const AVATARS = {
       neutral: "avatar_neutral.png",
@@ -94,6 +101,25 @@
     loadProblem();
 
     // --- メッセージ送信 ---
+=======
+    // --- 問題の取得 ---
+    async function loadProblem(){
+      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
+      const data = await res.json();
+      problemText = data.problem || "(まだ設定されていません)";
+      problemArea.textContent = "今日の問題: " + problemText;
+
+      // AI に自動で「最初の質問」を送らせる
+      if(problemText.trim() !== ""){
+        chat.innerHTML += `<div class="ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
+      }
+    }
+
+    loadProblem();
+
+
+    // --- チャット送信 ---
+>>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
     async function sendMessage(){
       const text = input.value.trim();
       if(!text) return;
@@ -113,6 +139,7 @@
       const data = await res.json();
       const ai = data.response;
 
+<<<<<<< HEAD
       const face = selectAvatar(ai);
 
       chat.innerHTML += `
@@ -123,6 +150,11 @@
 
       chat.scrollTop = chat.scrollHeight;
 
+=======
+      chat.innerHTML += `<div class="msg ai">児童: ${ai}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+>>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
       sendBtn.disabled = false;
       input.focus();
     }
