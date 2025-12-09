@@ -40,26 +40,64 @@
       <button id="sendBtn">送信</button>
     </div>
   </div>
-
-  <script>
+<script>
     const chat = document.getElementById("chat");
     const input = document.getElementById("msgInput");
     const sendBtn = document.getElementById("sendBtn");
     const problemArea = document.getElementById("problemArea");
 
     let problemText = "";
+    let answerText = ""; // ★ 解答も保持（先生のヒントとして利用可能）
 
+    /**
+     * URLからクエリパラメータ（ID）を取得する関数
+     */
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+    
     // --- 問題の取得 ---
     async function loadProblem(){
-      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
-      const data = await res.json();
-      problemText = data.problem || "(まだ設定されていません)";
-      problemArea.textContent = "今日の問題: " + problemText;
+        const questionId = getQueryParam('id'); // URLからIDを取得
+        
+        if (!questionId) {
+            problemText = "(問題が指定されていません)";
+            problemArea.textContent = problemText;
+            return;
+        }
 
-      // AI に自動で「最初の質問」を送らせる
-      if(problemText.trim() !== ""){
-        chat.innerHTML += `<div class="ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
-      }
+        try {
+            // 新しく作成した問題詳細APIを呼び出す
+            const res = await fetch(`/api/question_detail/${questionId}`); // ★ サーバーAPIのURLを使用
+            
+            if (!res.ok) {
+                problemText = `(問題データの取得に失敗しました: ${res.status})`;
+                problemArea.textContent = problemText;
+                return;
+            }
+            
+            const data = await res.json();
+            
+            // データを変数に格納
+            problemText = data.question_title + " - " + data.question; 
+            answerText = data.answer; 
+
+            // 問題エリアに表示
+            problemArea.innerHTML = `
+                <div style="font-weight:bold; margin-bottom:5px;">${data.question_title}</div>
+                <div>${data.question}</div>
+            `;
+
+            // AI に自動で「最初の質問」を送らせる
+            if(problemText.trim() !== ""){
+                chat.innerHTML += `<div class="msg ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
+            }
+
+        } catch (error) {
+            console.error("問題読み込みエラー:", error);
+            problemArea.textContent = "問題読み込み中にエラーが発生しました。";
+        }
     }
 
     loadProblem();
@@ -67,29 +105,32 @@
 
     // --- チャット送信 ---
     async function sendMessage(){
-      const text = input.value.trim();
-      if(!text) return;
+        const text = input.value.trim();
+        if(!text) return;
 
-      chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
-      chat.scrollTop = chat.scrollHeight;
+        chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
+        chat.scrollTop = chat.scrollHeight;
 
-      input.value = "";
-      sendBtn.disabled = true;
+        input.value = "";
+        sendBtn.disabled = true;
 
-      const res = await fetch("http://127.0.0.1:8000/api/ai_response", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ message: text })
-      });
+        // FastAPIサーバー（main.py）のAPIを呼び出す
+        // ★ サーバーのポートが 8000 (FastAPI) と 3000 (Node.js) で異なるため、
+        //    FastAPIのURLを明示的に指定します。
+        const res = await fetch("http://localhost:8000/api/ai_response", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ 
+                // 問題文と解答をAIにコンテキストとして送る
+                message: text,
+                // 問題文と解答をコンテキストとして追加（main.pyの仕様に依存）
+                context_problem: problemText,
+                context_answer: answerText 
+            })
+        });
 
-      const data = await res.json();
-      const ai = data.response;
-
-      chat.innerHTML += `<div class="msg ai">児童: ${ai}</div>`;
-      chat.scrollTop = chat.scrollHeight;
-
-      sendBtn.disabled = false;
-      input.focus();
+        // ... (後略。AI応答の処理はそのまま)
+        // ...
     }
 
     sendBtn.onclick = sendMessage;

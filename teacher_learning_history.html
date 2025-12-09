@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教えあいシステム - 解答状況確認</title>
+    <link rel="stylesheet" href="all.css"> 
+    
+    <style>
+        /* 基本スタイル */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .header { background-color: #4a7dff; color: white; padding: 15px 20px; font-size: 24px; font-weight: bold; }
+        .container { padding: 20px; max-width: 900px; margin: 20px auto; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { font-size: 24px; margin-bottom: 20px; }
+
+        /* テーブルスタイル */
+        #status-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #status-table th, #status-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        #status-table th {
+            background-color: #e0f0ff; /* 明るい青 */
+            font-weight: bold;
+        }
+        /* 解答状況のカラーコード */
+        .status-answered {
+            color: green;
+            font-weight: bold;
+        }
+        .status-unanswered {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="header">教えあいシステム</div>
+
+    <div class="container">
+        
+        <h1>児童の解答状況一覧</h1>
+
+        <div id="loading-message">
+            <p>解答状況データを読み込み中です...</p>
+        </div>
+        
+        <table id="status-table">
+            <thead>
+                <tr>
+                    <th>児童名</th>
+                    <th>問題タイトル</th>
+                    <th>状況</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+
+    </div>
+
+    <script type="module">
+        const tableBody = document.querySelector('#status-table tbody');
+        const loadingMessage = document.getElementById('loading-message');
+
+        /**
+         * 解答状況データを取得し、テーブルに表示する関数
+         */
+        async function fetchSubmissionStatus() {
+            try {
+                // Node.jsサーバーの新しいAPIエンドポイントを呼び出す
+                const response = await fetch('/api/submission_status'); 
+                
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー! ステータス: ${response.status}`);
+                }
+
+                const data = await response.json(); 
+                
+                loadingMessage.style.display = 'none'; // 読み込みメッセージを非表示に
+                renderStatusTable(data);
+
+            } catch (error) {
+                console.error('解答状況の取得エラー:', error);
+                loadingMessage.innerHTML = '<p style="color: red;">解答状況の読み込みに失敗しました。</p>';
+                loadingMessage.style.display = 'block';
+            }
+        }
+
+        /**
+         * 取得したデータを元にテーブルの行を生成する関数
+         * @param {Array<Object>} statuses - 解答状況オブジェクトの配列
+         */
+        function renderStatusTable(statuses) {
+            if (statuses.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4">表示するデータがありません。</td></tr>';
+                return;
+            }
+
+            statuses.forEach(status => {
+                const row = tableBody.insertRow();
+                
+                // 1. 児童名
+                row.insertCell().textContent = status.student_name;
+                
+                // 2. 問題タイトル
+                row.insertCell().textContent = status.question_title;
+                
+                // 3. 状況 (解答済み/未回答)
+                const statusCell = row.insertCell();
+                statusCell.textContent = status.status;
+                
+                // CSSクラスを適用して色付け
+                if (status.status === '解答済み') {
+                    statusCell.classList.add('status-answered');
+                } else {
+                    statusCell.classList.add('status-unanswered');
+                }
+            });
+        }
+
+        // ページ読み込み完了時に実行
+        fetchSubmissionStatus();
+    </script>
+</body>
+</html>
