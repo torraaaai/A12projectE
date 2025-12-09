@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="all.css">
+    <title>教えあいシステム - 問題登録</title>
+</head>
+<body>
+    
+    <div class="header">教えあいシステム</div>
+
+    <div class="container">
+        
+        <form id="question_registration_form">
+            <div class="input-group">
+                <label for="question_title_text">問題タイトルを入力してください</label>
+                <textarea id="question_title_text" name="question_title_text" required placeholder="例: 以下の数列の一般項を求めなさい。"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="question_text">問題文を入力してください</label>
+                <textarea id="question_text" name="question_text" required placeholder="例: 以下の数列の一般項を求めなさい。"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="answer_text">解答を入力してください</label>
+                <textarea id="answer_text" name="answer_text" required placeholder="例: 一般項は a_n = 2n + 1 です。"></textarea>
+            </div>
+
+            <div>
+                <button type="submit" class="submit-button">登録</button>
+            </div>
+            
+        </form>
+
+    </div>
+
+    <script type="module">
+        const form = document.getElementById('question_registration_form');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // フォームのデフォルト送信を防ぐ
+            
+            const questionTitleText = document.getElementById('question_title_text').value.trim();
+            const questionText = document.getElementById('question_text').value.trim();
+            const answerText = document.getElementById('answer_text').value.trim();
+
+            if (!questionTitleText || !questionText || !answerText) {
+                alert('問題文と解答の両方を入力してください。');
+                return;
+            }
+
+            console.log('問題登録処理を開始...');
+            
+             try {
+                 const response = await fetch('/api/question_registration', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+                         question_title: questionTitleText,
+                         question: questionText, 
+                         answer: answerText 
+                     })
+                 });
+                 
+                 if (response.ok) {
+                     alert('問題の登録が完了しました！');
+                     form.reset(); // フォームをクリア
+                 } else {
+                     const error = await response.json();
+                     alert('登録に失敗しました: ' + error.message);
+                 }
+             } catch (err) {
+                 alert('ネットワークエラーが発生しました。');
+             }
+
+        });
+    </script>
+</body>
+</html>

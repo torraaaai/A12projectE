@@ -1,225 +1,99 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>AI授業アバター</title>
-<style>
-body {
-    background: #eef2f7;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100vh;
-    padding-top: 20px;
-    font-family: sans-serif;
-}
-
-/* アバター全体 */
-.avatar {
-    width: 260px;
-    height: 360px;
-    position: relative;
-    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.25));
-}
-
-/* 顔の土台（立体的に） */
-.face {
-    width: 260px;
-    height: 320px;
-    background: linear-gradient(145deg, #ffe1c8, #f5c9a8);
-    border-radius: 120px;
-    position: relative;
-    box-shadow:
-        inset -10px -10px 20px rgba(0,0,0,0.15),
-        inset 10px 10px 25px rgba(255,255,255,0.6);
-}
-
-/* 目 */
-.eye {
-    width: 40px;
-    height: 40px;
-    background: #222;
-    border-radius: 50%;
-    position: absolute;
-    top: 110px;
-    animation: blink 5s infinite;
-}
-
-.eye.left  { left: 65px; }
-.eye.right { right: 65px; }
-
-/* まゆげ */
-.eyebrow {
-    width: 60px;
-    height: 12px;
-    background: #222;
-    border-radius: 12px;
-    position: absolute;
-    top: 80px;
-}
-
-.eyebrow.left  { left: 50px; }
-.eyebrow.right { right: 50px; }
-
-/* 困り眉 */
-.eyebrow.confused.left  { transform: rotate(20deg); top: 75px; }
-.eyebrow.confused.right { transform: rotate(-20deg); top: 75px; }
-
-/* にっこり眉 */
-.eyebrow.happy.left  { transform: rotate(-10deg); top: 85px; }
-.eyebrow.happy.right { transform: rotate(10deg); top: 85px; }
-
-/* 口（形を変えて表情に対応） */
-.mouth {
-    width: 90px;
-    height: 60px;
-    background: #c76;
-    position: absolute;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 0 0 50px 50px;
-    overflow: hidden;
-}
-
-/* 口パク */
-@keyframes talk {
-    0%   { height: 10px; }
-    50%  { height: 55px; }
-    100% { height: 10px; }
-}
-
-/* 困り顔（への字） */
-.mouth.confused {
-    width: 70px;
-    height: 10px;
-    border-radius: 20px;
-    background: #a44;
-}
-
-/* にっこり（カーブ） */
-.mouth.happy {
-    width: 110px;
-    height: 70px;
-    border-radius: 0 0 80px 80px;
-    background: #c66;
-    box-shadow: inset 0 -10px 15px rgba(0,0,0,0.2);
-}
-
-/* まばたき */
-@keyframes blink {
-    0%, 98% { transform: scaleY(1); }
-    99% { transform: scaleY(0.1); }
-}
-
-/* メッセージ欄 */
-.chat-box {
-    width: 80%;
-    max-width: 600px;
-    margin-top: 20px;
-}
-
-textarea {
-    width: 100%;
-    height: 80px;
-    font-size: 18px;
-    padding: 10px;
-}
-
-button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 12px;
-    font-size: 18px;
-    background: #4a8cff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-#response {
-    margin-top: 20px;
-    font-size: 20px;
-    white-space: pre-wrap;
-}
-</style>
+  <meta charset="utf-8" />
+  <title>児童チャット</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{
+      font-family:system-ui; margin:0;
+      background:#f5f7fa;
+      display:flex; justify-content:center;
+      padding:20px;
+    }
+    .box{
+      width:100%; max-width:750px;
+      background:white; border-radius:10px;
+      padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.1);
+    }
+    #chat{ height:420px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
+    .msg{ margin-bottom:12px; }
+    .me{ color:#0b6efd; }
+    .ai{ color:#333; background:#eef4ff; padding:8px; border-radius:6px; }
+    #inputArea{ margin-top:10px; display:flex; gap:8px; }
+    #inputArea input{ flex:1; padding:10px; }
+    #inputArea button{ padding:10px 14px; background:#0b6efd; color:white; border:none; }
+  </style>
 </head>
 <body>
+  <div class="box">
+    <h2>児童チャット</h2>
 
-<!-- ▼ アバター -->
-<div class="avatar">
-    <div class="face">
-        <div class="eyebrow left"></div>
-        <div class="eyebrow right"></div>
-        <div class="eye left"></div>
-        <div class="eye right"></div>
-        <div class="mouth"></div>
+    <div id="problemArea" style="padding:10px; background:#f0f0f0; margin-bottom:10px;">
+      問題読み込み中…
     </div>
-</div>
 
-<!-- ▼ 入力欄 -->
-<div class="chat-box">
-    <textarea id="userInput" placeholder="先生の説明や質問を入力してね"></textarea>
-    <button onclick="sendMessage()">送信</button>
-</div>
+    <div id="chat"></div>
 
-<!-- ▼ AI返答表示 -->
-<div id="response">児童の返答がここに表示されるよ</div>
+    <div id="inputArea">
+      <input id="msgInput" type="text" placeholder="説明を入力" />
+      <button id="sendBtn">送信</button>
+    </div>
+  </div>
 
-<script>
-// === アバター制御 ===
-const mouth = document.querySelector(".mouth");
-const brows = document.querySelectorAll(".eyebrow");
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const problemArea = document.getElementById("problemArea");
 
-function setTalking() {
-    mouth.className = "mouth";
-    mouth.style.animation = "talk 0.35s infinite";
-    brows.forEach(b => b.className = "eyebrow " + (b.classList.contains("left") ? "left" : "right"));
-}
+    let problemText = "";
 
-function setConfused() {
-    mouth.className = "mouth confused";
-    mouth.style.animation = "none";
-    brows.forEach(b => b.className = "eyebrow confused " + (b.classList.contains("left") ? "left" : "right"));
-}
+    // --- 問題の取得 ---
+    async function loadProblem(){
+      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
+      const data = await res.json();
+      problemText = data.problem || "(まだ設定されていません)";
+      problemArea.textContent = "今日の問題: " + problemText;
 
-function setHappy() {
-    mouth.className = "mouth happy";
-    mouth.style.animation = "none";
-    brows.forEach(b => b.className = "eyebrow happy " + (b.classList.contains("left") ? "left" : "right"));
-}
+      // AI に自動で「最初の質問」を送らせる
+      if(problemText.trim() !== ""){
+        chat.innerHTML += `<div class="ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
+      }
+    }
 
-// --- メッセージ送信 ---
-async function sendMessage() {
-    const text = document.getElementById("userInput").value;
-    if (!text.trim()) return;
+    loadProblem();
 
-    setTalking(); // AIが返すまで口パク状態にする
 
-    let res = await fetch("http://127.0.0.1:8000/api/ai_response", {
+    // --- チャット送信 ---
+    async function sendMessage(){
+      const text = input.value.trim();
+      if(!text) return;
+
+      chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      input.value = "";
+      sendBtn.disabled = true;
+
+      const res = await fetch("http://127.0.0.1:8000/api/ai_response", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ message: text })
-    });
+      });
 
-    let data = await res.json();
+      const data = await res.json();
+      const ai = data.response;
 
-    const aiText = data.response;
-    document.getElementById("response").textContent = "児童: " + aiText;
+      chat.innerHTML += `<div class="msg ai">児童: ${ai}</div>`;
+      chat.scrollTop = chat.scrollHeight;
 
-    // 表情切り替え
-    if (aiText.includes("わからない") || aiText.includes("むずかしい")) {
-        setConfused();
-    } else if (aiText.includes("なるほど") || aiText.includes("わかった") || aiText.includes("理解")) {
-        setHappy();
-    } else {
-        setTalking();
-        setTimeout(()=> mouth.style.animation = "none", 1200);
+      sendBtn.disabled = false;
+      input.focus();
     }
-}
-</script>
 
+    sendBtn.onclick = sendMessage;
+    input.onkeydown = (e)=>{ if(e.key==="Enter") sendMessage(); };
+  </script>
 </body>
 </html>
