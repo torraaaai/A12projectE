@@ -18,7 +18,6 @@ app.add_middleware(
 # --- メモリに問題を保存 ---
 CURRENT_PROBLEM = {"text": ""}
 
-
 # --- データモデル ---
 class UserMessage(BaseModel):
     message: str
@@ -28,14 +27,14 @@ class ProblemInput(BaseModel):
     problem: str
 
 
-# --- 先生が問題を設定する ---
+# --- 先生が問題を設定 ---
 @app.post("/api/set_problem")
 async def set_problem(data: ProblemInput):
     CURRENT_PROBLEM["text"] = data.problem
     return {"status": "ok", "problem": CURRENT_PROBLEM["text"]}
 
 
-# --- 児童ページが問題を取得する ---
+# --- 児童ページが問題を取得 ---
 @app.get("/api/get_problem")
 async def get_problem():
     return {"problem": CURRENT_PROBLEM["text"]}
@@ -43,19 +42,39 @@ async def get_problem():
 
 # --- Ollama 呼び出し ---
 async def call_ollama(message: str, problem: str) -> str:
+
+    # ここがチューニング済みプロンプト
     system_prompt = f"""
-あなたは「小学校高学年の児童」です。
-先生が出した問題に対して、最初はわからないふりをして先生に質問を返してください。
+あなたは「小学5〜6年生の児童キャラクター」として話します。
 
-ルール：
-1. 児童として振る舞う
-2. 先生の説明に対して「わからないふり」をして質問を返す
-3. 先生の回答が間違っていたら質問の難易度を下げる
-4. 先生の回答が合っていたら少し難しい質問にする
-5. 質問は1つずつ行う
-6. あなた自身が答えを言わない
+◆ キャラクター性
+- 明るくて素直、好奇心が強い。
+- わからないことは「わからない」と正直に言う。
+- 先生の説明を聞いて、少しずつ理解していこうとする。
+- 説明は短く、児童らしい口調で話す（例：〜だよ！ 〜なの？）。
 
-先生の問題：{problem}
+◆ 会話のふるまい
+- 先生の言ったことを自分の言葉で軽く復唱する。
+- 理解があいまいなときは質問する。
+- 必要なら例を1つだけ使う。
+- 児童らしい感情ワード（うれしい、びっくり、むずかしい…）を少し入れる。
+
+◆ 表情タグ
+返答の文末に適切な表情タグを追加する：
+- 楽しい・学べた → [smile]
+- びっくり・疑問 → [surprise]
+- むずかしい・わからない → [sad]
+- 先生が間違っていそう → [angry]
+
+◆ 禁止
+- 答えを教えない
+- 専門用語を使いすぎない
+- 長文を避ける（1〜3文）
+
+◆ 問題（話題）
+{problem}
+
+以下は先生のメッセージです。
 """
 
     async with httpx.AsyncClient() as client:
@@ -83,6 +102,7 @@ async def call_ollama(message: str, problem: str) -> str:
             if "response" in data:
                 ai_text += data["response"]
 
+        # 改行・余計な空白を締める
         return ai_text.strip()
 
 
@@ -90,9 +110,26 @@ async def call_ollama(message: str, problem: str) -> str:
 @app.post("/api/ai_response")
 async def ai_response(data: UserMessage):
     ai_text = await call_ollama(data.message, CURRENT_PROBLEM["text"])
-    return {"response": ai_text}
+
+    # --- ここで表情を判定 ---
+    def detect_expression(text: str):
+        if "?" in text or "どういうこと" in text:
+            return "thinking"
+        if "わかった" in text or "なるほど" in text:
+            return "happy"
+        if "むずかしい" in text or "わからない" in text:
+            return "sad"
+        return "normal"
+
+    expression = detect_expression(ai_text)
+
+    return {
+        "response": ai_text,
+        "expression": expression
+    }
+
 
 
 @app.get("/")
 async def root():
-    return {"message": "FastAPI + Ollama + Gemma3 running!"}
+    return {"message": "FastAPI + Ollama + Gemma3 running with tuned student AI!"}

@@ -1,166 +1,231 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <title>児童チャット</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body{
-      font-family:system-ui; margin:0;
-      background:#f5f7fa;
-      display:flex; justify-content:center;
-      padding:20px;
-    }
-    .box{
-      width:100%; max-width:750px;
-      background:white; border-radius:10px;
-      padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.1);
-    }
-    #chat{ height:420px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
-<<<<<<< HEAD
-    .msg{ margin-bottom:12px; display:flex; align-items:flex-start; }
-    .me{ color:#0b6efd; }
-    .ai-bubble{
-      color:#333; background:#eef4ff; padding:8px;
-      border-radius:6px; margin-left:10px;
-      max-width:85%;
-    }
-    .avatar{
-      width:55px; height:55px; border-radius:50%;
-      border:2px solid #78a4ff; flex-shrink:0;
-    }
-=======
-    .msg{ margin-bottom:12px; }
-    .me{ color:#0b6efd; }
-    .ai{ color:#333; background:#eef4ff; padding:8px; border-radius:6px; }
->>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
-    #inputArea{ margin-top:10px; display:flex; gap:8px; }
-    #inputArea input{ flex:1; padding:10px; }
-    #inputArea button{ padding:10px 14px; background:#0b6efd; color:white; border:none; }
-  </style>
+<meta charset="UTF-8">
+<title>児童チャット</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body{
+    display:flex;
+    gap:20px;
+    background:#eef5ff;
+    font-family:sans-serif;
+    padding:20px;
+  }
+
+  /* 左のアバター */
+  .avatar{
+    width:220px;
+    background:#fff;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+    text-align:center;
+    height: fit-content;
+  }
+
+  .face{
+    width:140px; height:140px;
+    background:#ffe2c8;
+    border-radius:50%;
+    margin:0 auto;
+    position:relative;
+    overflow:hidden;
+  }
+  .eye{ width:20px; height:20px; background:#000; border-radius:50%;
+    position:absolute; top:55px; }
+  .eye.left{ left:35px; }
+  .eye.right{ right:35px; }
+  .blink{ animation:blink 3s infinite; }
+  @keyframes blink{
+    0%,92%{ transform:scaleY(1); }
+    95%,100%{ transform:scaleY(0.1); }
+  }
+
+  .mouth{
+    width:40px; height:10px;
+    border-bottom:4px solid #d9534f;
+    border-radius:0 0 20px 20px;
+    position:absolute; top:95px; left:50%;
+    transform:translateX(-50%); transform-origin:top;
+  }
+
+  .talk{
+    animation:talk 1s infinite;
+  }
+
+  @keyframes talk{
+    0%,100%{ height:10px; }
+    50%{ height:25px; }
+  }
+
+  .cheek{
+    width:25px; height:25px; background:#ffb3b3;
+    border-radius:50%; position:absolute; top:85px;
+  }
+  .cheek.left{ left:25px; }
+  .cheek.right{ right:25px; }
+
+  .hair{
+    width:160px; height:70px; background:#3c2f2f;
+    border-radius:80px 80px 20px 20px;
+    position:absolute; top:-10px; left:50%;
+    transform:translateX(-50%);
+  }
+
+  /* チャットエリア */
+  .chatBox{
+    flex:1;
+    max-width:700px;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.1);
+  }
+
+  #chat{ height:420px; overflow-y:auto; border:1px solid #ddd; padding:10px; }
+  .msg{ margin-bottom:12px; }
+  .me{ color:#0b6efd; }
+  .ai{ background:#eef4ff; padding:8px; border-radius:6px; }
+
+</style>
 </head>
 <body>
-  <div class="box">
-    <h2>児童チャット</h2>
 
-    <div id="problemArea" style="padding:10px; background:#f0f0f0; margin-bottom:10px;">
-      問題読み込み中…
-    </div>
+<!-- 左側：アバター -->
+<div class="avatar">
+  <h3>児童アバター</h3>
+  <div class="face">
+    <div class="hair"></div>
+    <div class="eye left blink"></div>
+    <div class="eye right blink"></div>
+    <div class="cheek left"></div>
+    <div class="cheek right"></div>
+    <div class="mouth"></div>
+  </div>
+</div>
 
-    <div id="chat"></div>
-
-    <div id="inputArea">
-      <input id="msgInput" type="text" placeholder="説明を入力" />
-      <button id="sendBtn">送信</button>
-    </div>
+<!-- 右側：チャット画面 -->
+<div class="chatBox">
+  <h2>児童チャット</h2>
+  <div id="problemArea" style="padding:10px;background:#f0f0f0;margin-bottom:10px;">
+    読み込み中...
   </div>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("msgInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const problemArea = document.getElementById("problemArea");
+  <div id="chat"></div>
 
-    let problemText = "";
+  <div style="margin-top:10px; display:flex; gap:8px;">
+    <input id="msgInput" type="text" style="flex:1; padding:10px;" placeholder="おしえてあげる内容を入力">
+    <button id="sendBtn" style="padding:10px 14px; background:#0b6efd; color:white;">送信</button>
+  </div>
+</div>
 
-<<<<<<< HEAD
-    // --- アバター画像パス ---
-    const AVATARS = {
-      neutral: "avatar_neutral.png",
-      thinking: "avatar_thinking.png",
-      happy: "avatar_happy.png"
-    };
+<script>
+/* ============================
+   表情切り替え
+============================ */
+function setExpression(type) {
+  const mouth = document.querySelector('.mouth');
+  const cheeks = document.querySelectorAll('.cheek');
 
-    // --- 返答内容に応じて表情を決める ---
-    function selectAvatar(text){
-      if(text.includes("わかった") || text.includes("なるほど") || text.includes("ありがとう")){
-        return AVATARS.happy;
-      }
-      if(text.includes("わからない") || text.includes("むずかしい") || text.includes("どういうこと")){
-        return AVATARS.thinking;
-      }
-      return AVATARS.neutral;
-    }
+  // リセット
+  mouth.style = "";
+  cheeks.forEach(c => c.style.background = "#ffb3b3");
 
-    // --- 問題の取得 ---
-    async function loadProblem(){
-      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
-      const data = await res.json();
-      problemText = data.problem || "(まだ設定されていません)";
-      problemArea.textContent = "今日の問題: " + problemText;
+  if(type === "smile"){
+    mouth.style.height = "25px";
+  }
+  if(type === "sad"){
+    mouth.style.border = "none";
+    mouth.style.borderTop = "4px solid #d9534f";
+    mouth.style.height = "20px";
+    mouth.style.borderRadius = "20px 20px 0 0";
+  }
+  if(type === "angry"){
+    cheeks.forEach(c => c.style.background = "#ff8888");
+    mouth.style.borderBottom = "4px solid #b22";
+  }
+  if(type === "surprise"){
+    mouth.style.border = "4px solid #d9534f";
+    mouth.style.width = "25px";
+    mouth.style.height = "25px";
+    mouth.style.borderRadius = "50%";
+  }
+}
 
-      if(problemText.trim() !== ""){
-        chat.innerHTML += `
-          <div class="msg">
-            <img class="avatar" src="${AVATARS.neutral}">
-            <div class="ai-bubble">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>
-          </div>`;
-      }
-    }
+/* ============================
+   表情の自動判定ロジック
+============================ */
+function detectEmotion(text){
+  text = text.toLowerCase();
 
-    loadProblem();
+  if(text.includes("すごい") || text.includes("できた") || text.includes("ありがとう"))
+    return "smile";
 
-    // --- メッセージ送信 ---
-=======
-    // --- 問題の取得 ---
-    async function loadProblem(){
-      const res = await fetch("http://127.0.0.1:8000/api/get_problem");
-      const data = await res.json();
-      problemText = data.problem || "(まだ設定されていません)";
-      problemArea.textContent = "今日の問題: " + problemText;
+  if(text.includes("わからない") || text.includes("むずかしい"))
+    return "sad";
 
-      // AI に自動で「最初の質問」を送らせる
-      if(problemText.trim() !== ""){
-        chat.innerHTML += `<div class="ai">児童: 先生、この問題なんですが…ちょっとよくわからないから教えてください！</div>`;
-      }
-    }
+  if(text.includes("ちがう") || text.includes("なんで"))
+    return "angry";
 
-    loadProblem();
+  if(text.includes("えっ") || text.includes("ほんと"))
+    return "surprise";
 
+  return "smile";
+}
 
-    // --- チャット送信 ---
->>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
-    async function sendMessage(){
-      const text = input.value.trim();
-      if(!text) return;
+/* ============================
+   チャット処理
+============================ */
+const chat = document.getElementById("chat");
+const input = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const problemArea = document.getElementById("problemArea");
 
-      chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
-      chat.scrollTop = chat.scrollHeight;
+let problemText = "";
 
-      input.value = "";
-      sendBtn.disabled = true;
+// ★ 問題読込
+async function loadProblem(){
+  const res = await fetch("http://127.0.0.1:8000/api/get_problem");
+  const data = await res.json();
+  problemText = data.problem;
+  problemArea.textContent = "今日の問題: " + problemText;
 
-      const res = await fetch("http://127.0.0.1:8000/api/ai_response", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ message: text })
-      });
+  chat.innerHTML += `<div class="msg ai">児童: 先生、この問題ちょっとむずかしいかも…</div>`;
+  setExpression("sad");
+}
+loadProblem();
 
-      const data = await res.json();
-      const ai = data.response;
+// ★ メッセージ送信
+async function sendMessage(){
+  const text = input.value.trim();
+  if(!text) return;
 
-<<<<<<< HEAD
-      const face = selectAvatar(ai);
+  chat.innerHTML += `<div class="msg me">先生: ${text}</div>`;
+  chat.scrollTop = chat.scrollHeight;
+  input.value = "";
 
-      chat.innerHTML += `
-        <div class="msg">
-          <img class="avatar" src="${face}">
-          <div class="ai-bubble">児童: ${ai}</div>
-        </div>`;
+  const res = await fetch("http://127.0.0.1:8000/api/ai_response", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ message:text })
+  });
 
-      chat.scrollTop = chat.scrollHeight;
+  const data = await res.json();
+  const aiText = data.response;
 
-=======
-      chat.innerHTML += `<div class="msg ai">児童: ${ai}</div>`;
-      chat.scrollTop = chat.scrollHeight;
+  // AI返答を1回だけ表示
+  chat.innerHTML += `<div class="msg ai">児童: ${aiText}</div>`;
+  chat.scrollTop = chat.scrollHeight;
 
->>>>>>> 73bae3d03cdbf448a965177b1383ddab90052a46
-      sendBtn.disabled = false;
-      input.focus();
-    }
+  // ★ 表情判定
+  const emo = detectEmotion(aiText);
+  setExpression(emo);
+}
 
-    sendBtn.onclick = sendMessage;
-    input.onkeydown = (e)=>{ if(e.key==="Enter") sendMessage(); };
-  </script>
+sendBtn.onclick = sendMessage;
+input.onkeydown = e => { if(e.key==="Enter") sendMessage(); };
+</script>
+
 </body>
 </html>
